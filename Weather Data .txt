@@ -1,0 +1,478 @@
+https://65ca3cf0105ed509f6a2d30f--mellow-kitsune-2b959b.netlify.app/
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather Data Form</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    #weatherForm {
+      background-color: #fff;
+      margin-top: 80px;
+      /* margin-bottom: 80px; */
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      /* width: 500px; */
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      height: 100vh;
+      overflow-y: auto;
+
+      
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    input[type="text"],
+    input[type="date"] {
+      width: calc(100% - 12px);
+      padding: 8px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    input[type="submit"],
+    input[type="button"] {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 10px;
+      width: 100%;
+    }
+
+    input[type="submit"]:hover,
+    input[type="button"]:hover {
+      background-color: #45a049;
+    }
+
+    #weather-data {
+      border-radius: 4px;
+      background-color: #f9f9f9;
+      margin: 20px auto;
+      padding: 20px;
+      /* max-width: 800px; */
+      max-width: 100vw;
+      overflow-x: auto;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    #weather-data table {
+      width: 100%;
+
+      /* max-width: 100vw; */
+      border-collapse: collapse;
+      border-spacing: 0;
+      flex-grow: 1;
+    }
+
+    #weather-data th,
+    #weather-data td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    #download-btn {
+      margin-top: 10px;
+      display: block;
+      margin: 20px auto;
+      background-color: #4CAF50;
+      border-radius: 10px;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      cursor: pointer;
+      margin-top: 10px;
+      width: 100%;
+    }
+
+    #form {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    #form label,
+    #form input[type="text"],
+    #form input[type="date"] {
+      width: calc(36% - 20px);
+      margin-bottom: 10px;
+      height: 30px;
+    }
+
+    #form select,
+    #form input[type="submit"] {
+    width: calc(36% - 10px); /* Adjust as needed to leave some space between elements */
+    margin-bottom: 20px;
+    box-sizing: border-box;
+    height: 30px;
+
+}
+
+    #form label {
+      padding-left: 40px;
+      box-sizing: border-box;
+      width: 14%;
+      margin-left: 2px;
+    }
+
+    #form input[type="submit"] {
+      width: 100%;
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <div id="weatherForm">
+    <h2 style="color: #45a049;">Weather Data Form</h2>
+    <br>
+    <form id="form">
+      <label for="state">State:</label>
+      <!-- <input type="text" id="state" name="state" required> -->
+      <select id="state" name="state">
+        <option value="">Select State</option>
+        <!-- States will be populated here -->
+    </select>
+
+      <label for="district">District:</label>
+      <!-- <input type="text" id="district" name="district" required> -->
+      <select id="district" disabled>
+        <option value="">Select District</option>
+        <!-- Districts will be populated based on state selection -->
+    </select>
+
+      <label for="taluka">Taluka:</label>
+      <!-- <input type="text" id="taluka" name="taluka"> -->
+      <select id="taluka" disabled>
+        <option value="">Select Taluka</option>
+        <!-- Talukas will be populated based on district selection -->
+    </select>
+
+      <label for="village">Village:</label>
+      <!-- <input type="text" id="village" name="village"> -->
+      <select id="village" disabled>
+        <option value="">Select Village</option>
+        <!-- Villages will be populated based on taluka selection -->
+    </select>
+
+
+
+      <label for="fromDate">From Date:</label>
+      <input type="date" id="fromDate" name="fromDate" required>
+
+      <label for="toDate">To Date:</label>
+      <input type="date" id="toDate" name="toDate" placeholder="dd-mm-yyyy" required>
+
+
+      <input type="submit" value="Get Weather Data">
+    </form>
+
+    <div id="weather-data"></div>
+
+    <button id="download-btn" style="display: none;">Download Weather Data</button>
+  </div>
+
+
+  <script>
+    // The nested data structure, simplified for demonstration
+    const data = {
+
+        "Rajasthan": {
+            "Barmer": {
+                "Siwana": ["Phoolan", "Arjiyana", "Baloo", "Loodrara", "Mangla", "Meli"],
+                "Chohtan": ["Cheetradi"],
+                "Sheo": ["Girab", "Kubriya", "Shastri Gaon"]
+            },
+            "Jaisalmer": {
+                "Pokaran": ["Bardana", "Bardana-1", "Chhayan", "Chhayan 2", "Chhayan-I", "Loharki", "Ajasar", "Askandra", "Bhadariya", "Didhoo", "Satyaya", "Tota"],
+                "Fatehgarh": ["Moolana"],
+                "Jaisalmer": ["Ridawa", "Sanwala"]
+            },
+            "Bikaner": {
+                "Kolayat": ["Hirai Ki Dhani"]
+            },
+            "Jodhpur": {
+                "Phalodi": ["Khara", "Raneri", "Baroo", "Ahopnagar", "Jharasar", "Padmet Nagar", "Sada", "Sonalpura", "Tekra"]
+            },
+            "Sirohi": {
+                "Reodar": ["Dhanera", "Jeerawal", "Khan", "Leelora", "Varman", "Wasan"]
+            },
+            "Jalor": {
+                "Jalor": ["Digaon"]
+            }
+        },
+
+        "Madhya Pradesh": {
+            "Neemuch": {
+                "Manasa": ["Bhagal Khurd", "Bhagori", "Mokadi", "Basaniya", "Deoran", "Ganespura", "Gujrat", "Jannod", "Molki Buzurg", "Tolkhedi", "Amalya", "Chikli", "Kundalya", "Amarpura", "Danta", "Ramkheda", "Ratanpura"],
+                "Rampura": ["Basantpur", "Barlai", "Nali", "Badodiya", "Lasudiya Istmurar"]
+            },
+            "Jawad": {
+                "Haripura [Ratangarh]": []
+            },
+            "Khargone (West Nimar)": {
+                "Bhikangaon": ["Anjangaon", "Bhrut", "Boruth", "Chhirwa", "Gawal", "Ghodwa", "Kharvi", "Pokhar Khurd"],
+                "Kasrawad": ["Motapura", "Singun", "Singun New", "Nandala"],
+                "Khargone": ["Dasanga", "Dongargaon", "Akawalya", "Dabhad", "Ghegaon", "Likkhi", "Rajur", "Ramangaon", "Surpala [Dhabhad]"],
+                "Segoan": ["Kamodwara"]
+            }
+        },
+
+        "Maharashtra": {
+            "Hingoli": {
+                "Basmath": ["Asegaon", "Hayatnagar", "Korta", "Palsi", "Basmat", "Bhogaon", "Darephal", "Dhanora-tarf-Aral", "Ekrukha", "Injangaon", "Kurunda", "Pangra shinde", "Ranjana", "Raywadi", "Satefal tarf Aral", "Bagdad", "Borala", "Chondhi", "Kinhola", "Mudi", "Pardi Bk.", "Pimprala", "Sarola", "Tuljapurwadi"],
+                "Aundha": ["Asonda"]
+            },
+            "Nanded": {
+                "Nanded": ["Pokharni", "Sayal", "Ekdara", "Nila"],
+                "Ardhapur": ["Dhamdari"]
+            },
+            "Parbhani": {
+                "Parbhani": ["Pandhari"],
+                "Purna": ["Mategaon"]
+            }
+        },
+
+        "Punjab": {
+            "Patiala": {
+                "Bhunerheri": ["Dundi Majra", "Makbulpur Bhiai", "New Bahadargarh"],
+                "Patiala": ["Akot", "Alipur jattan", "Bahadurgarh", "Balamgarh", "Bathoi Kalan", "Behal", "Chuharpur Jattan", "Dhakarba", "Fatehpur", "Harana", "Hari Nagar Urf Kherki", "Karhali Sahib", "Kartarpur", "Khaktan Kalan", "Khudda", "Lalina", "Mahru", "Malakpur", "Malakpur Kamboan", "Mardan Heri", "Mavi Sapan", "Nain Kalan", "Sagra", "Sanaur", "Sheikhpura", "Shekhupura"],
+                "Patran": ["Arno", "Beharjach", "Daroli", "Galoli", "Ganeshpura Alias Seona", "Gulzarpur Alias Tharwa", "Gurditpura", "Harchandpura", "Matauli", "Pampur Parta", "Patran", "Shergarh", "Shutrana", "Taipur"],
+                "Samana": ["Ajit Nagar", "Badshahpur", "Chohat", "Dhanauri", "Dullar", "Fatehpur", "Gobind Nagar", "Jamalpur", "Kakra", "Kakrala", "Kamalpur", "Nassupur", "Rajla", "Todarpur"],
+                "Sanour": ["BathoiKhurd", "Kathgarh", "Khansian"]
+            }
+        },
+
+        "Karnataka": {
+            "Belgaum": {
+                "Athni": ["Desairatti", "Fadatarawadi", "Khotanatti", "Kodaganur", "Yadalgi", "Yakkanchi", "Badchi", "Balligeri", "Chamakeri", "Kempwad", "Radderahatti"]
+            }
+        },
+        "Haryana": {
+            "Kaithal": {
+                "Guhla": ["Arnoli", "Azimgarh", "Badsui", "Bhatian", "Cheeka", "Kallar Majra", "Kasaur", "Lendaheri", "Majheri", "Mastgarh", "Pisawal", "Ramthali", "Ratta Khera", "Ratta Khera Luqman", "Sair", "Salampur", "Salimpur", "Sarola", "Tatiyana", "Theh Kharak"],
+                "Kaithal": ["Andhali", "Badsui", "Barot", "Govindpura", "Janedpur", "Ladhana baba", "Malikpur", "Nagal", "Patti Afgan", "Patti Khot", "Sirta", "Siwan"],
+                "Siwan": ["Firojpur", "Gobindpura", "Gohran", "Khanpur", "Kharkan", "Khedi Gulam Ali", "Malakpur", "Parbot"]
+            },
+            "Kurukshetra": {
+                "Pehowa": ["Adoya", "Arnaicha", "Asmanpur", "Bachki", "Batheri", "Gumthala Garhu", "Kanthla", "Mangna", "Nanakpur", "Pehowa", "Raun", "Sandhola", "Sandholi", "Thana", "Theh Malbora", "Urnai"],
+                "Thanesar": ["Amin", "BIR Amin"]
+            }
+        },
+
+        "Himachal Pradesh": {
+            "Sirmaur": {
+                "Kamrau": ["Kotga Kandon", "Kunair Dhamaun", "Poka"],
+                "Paonta Sahib": ["Agrau", "Badhana", "Banor", "Bhaila", "Kadela Adhwar", "Kangra Gurasa", "Killor", "Kirog", "Lobhi", "Rajpur Daghali", "Amboa", "Bharli", "Danda", "Klatha", "Nagheta", "Ram Nagar", "Shiwa Ridana", "Tauru"]
+            }
+        }
+
+
+
+    };
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var stateDropdown = document.getElementById('state');
+        var districtDropdown = document.getElementById('district');
+        var talukaDropdown = document.getElementById('taluka');
+        var villageDropdown = document.getElementById('village');
+
+        function clearDropdown(dropdown) {
+            while (dropdown.options.length > 1) {
+                dropdown.remove(1);
+            }
+        }
+        // Function to populate the state dropdown
+        function populateStates() {
+            for (var state in data) {
+                var option = document.createElement('option');
+                option.value = state;
+                option.innerHTML = state;
+                stateDropdown.appendChild(option);
+            }
+        }
+
+        // Function to populate the next dropdown based on the selection of the previous one
+        function populateNextDropdown(parentDropdownId, childDropdownId, data) {
+            var parentDropdown = document.getElementById(parentDropdownId);
+            var childDropdown = document.getElementById(childDropdownId);
+            childDropdown.innerHTML = '<option value="">Select ' + childDropdownId.split('-')[0] + '</option>'; // Reset child dropdown
+            childDropdown.disabled = true; // Disable child dropdown until parent is selected
+
+            var selectedValue = parentDropdown.value;
+            if (selectedValue) {
+                for (var key in data[selectedValue]) {
+                    var option = document.createElement('option');
+                    option.value = key;
+                    option.innerHTML = key;
+                    childDropdown.appendChild(option);
+                }
+                childDropdown.disabled = false; // Enable child dropdown
+            }
+        }
+
+        // Function to populate the village dropdown based on selected taluka
+        function populateVillageDropdown(state, district, taluka) {
+            var villages = data[state][district][taluka];
+            var villageDropdown = document.getElementById('village');
+            clearDropdown(villageDropdown);
+            for (var i = 0; i < villages.length; i++) {
+                var option = document.createElement('option');
+                option.value = villages[i];
+                option.innerHTML = villages[i];
+                villageDropdown.appendChild(option);
+            }
+            villageDropdown.disabled = false;
+        }
+
+        // Event listeners for dropdown changes
+        document.getElementById('state').addEventListener('change', function () {
+            clearDropdown(districtDropdown);
+            clearDropdown(talukaDropdown);
+            clearDropdown(villageDropdown);
+            populateNextDropdown('state', 'district', data);
+        });
+        document.getElementById('district').addEventListener('change', function () {
+            clearDropdown(talukaDropdown);
+            clearDropdown(villageDropdown);
+            var state = document.getElementById('state').value;
+            populateNextDropdown('district', 'taluka', data[state]);
+        });
+        document.getElementById('taluka').addEventListener('change', function () {
+            var state = document.getElementById('state').value;
+            var district = document.getElementById('district').value;
+            var taluka = document.getElementById('taluka').value;
+            populateVillageDropdown(state, district, taluka);
+        });
+
+        // Initial population of states
+        window.onload = function () {
+            populateStates();
+        };
+    });
+</script>
+
+
+  <script>
+
+
+    document.getElementById('form').addEventListener('submit', function (event) {
+      event.preventDefault();
+
+      const state = document.getElementById('state').value;
+      const district = document.getElementById('district').value;
+      const taluka = document.getElementById('taluka').value;
+      const village = document.getElementById('village').value;
+      const fromDate = document.getElementById('fromDate').value;
+      const toDate = document.getElementById('toDate').value;
+
+      const input = { state, district, taluka, village };
+
+
+
+      const apiKey = '6S2GS5YWLU2LQG9QAGRJKUXDS';
+      const apiUrl = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${state}%2C${district}%2C${taluka}%2C${village}/${fromDate}/${toDate}?unitGroup=metric&include=days&key=6S2GS5YWLU2LQG9QAGRJKUXDS&contentType=json
+`;
+
+      fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+          displayWeatherData(data, input);
+          enableDownload(data, input);
+        })
+        .catch(error => console.error('Error fetching weather data:', error));
+    });
+
+    function displayWeatherData(data, input) {
+      const weatherDataDiv = document.getElementById('weather-data');
+      weatherDataDiv.innerHTML = ''; // Clear previous data
+      const table = document.createElement('table');
+      const headerRow = table.insertRow();
+      const columns = ['State/District/Taluka/Village', 'datetime', 'precip', 'precipprob', 'precipcover', 'preciptype'];
+
+      columns.forEach(column => {
+        const headerCell = document.createElement('th');
+        headerCell.textContent = column.charAt(0).toUpperCase() + column.slice(1);
+        headerRow.appendChild(headerCell);
+      });
+
+      data.days.forEach(day => {
+        const row = table.insertRow();
+        const stateDistrictTalukaVillage = input.state + ', ' + input.district + ', ' + input.taluka + ', ' + input.village;
+        const cell = row.insertCell();
+        cell.textContent = stateDistrictTalukaVillage;
+
+        columns.slice(1).forEach(column => {
+          const cell = row.insertCell();
+          cell.textContent = day[column];
+        });
+      });
+
+      weatherDataDiv.appendChild(table);
+    }
+
+    function enableDownload(data, input) {
+      const downloadBtn = document.getElementById('download-btn');
+      downloadBtn.style.display = 'block';
+      downloadBtn.addEventListener('click', function () {
+        const filteredData = data.days.map(day => {
+          const rowData = {
+            'State': input.state,
+            'District': input.district,
+            'Taluka': input.taluka,
+            'Village': input.village,
+            'Datetime': day.datetime,
+            'Precip': day.precip,
+            'Precip Prob': day.precipprob,
+            'Precip Cover': day.precipcover,
+            'Precip Type': day.preciptype
+          };
+          return rowData;
+        });
+        const csvContent = "data:text/csv;charset=utf-8," +
+          Object.keys(filteredData[0]).join(",") + "\n" +
+          filteredData.map(obj => Object.values(obj).join(",")).join("\n");
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "weather_data.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      });
+    }
+
+
+  </script>
+</body>
+
+</html>
